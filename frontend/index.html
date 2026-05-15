@@ -21,7 +21,7 @@
       >
         <div
           class="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-200 relative"
-          :class="dndActive ? 'bg-indigo-500/40' : (unconfirmedCount > 0 ? (pulseActive ? 'bg-blue-500 dot-pulse' : 'bg-blue-500') : 'bg-white/15 hover:bg-white/25')"
+          :class="dndActive ? 'bg-indigo-500/40' : (unconfirmedCount > 0 ? (pulseActive ? 'bg-dot dot-pulse' : 'bg-dot') : 'bg-white/15 hover:bg-white/25')"
         >
           <!-- Moon icon during DND, bell otherwise -->
           <svg x-show="dndActive" class="w-5 h-5 text-indigo-200/70" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
@@ -48,8 +48,8 @@
         :class="{ 'toast-print': toastAnimating, 'toast-retract': toastRetracting }"
         @mouseenter="pauseToastTimer" @mouseleave="resumeToastTimer"
       >
-        <div class="rounded-b-2xl rounded-t-sm overflow-hidden" style="background: rgba(22, 27, 34, 0.96); backdrop-filter: blur(20px);">
-          <div class="h-[3px] bg-gradient-to-r from-blue-500/60 via-blue-400/40 to-transparent"></div>
+        <div class="rounded-b-2xl rounded-t-sm overflow-hidden" style="background: rgba(var(--theme-bg), 0.96); backdrop-filter: blur(20px);">
+          <div class="h-[3px] bg-gradient-to-r from-[var(--theme-accent)]/60 via-[var(--theme-accent-400)]/40 to-transparent"></div>
           <template x-for="(n, idx) in toastNotifications" :key="n.id">
             <div class="px-4 py-3" :class="{ 'border-t border-white/5': idx > 0 }">
               <div class="flex items-start justify-between mb-1">
@@ -62,7 +62,7 @@
               <div class="text-xs text-white/40 mb-3" x-text="n.repo"></div>
               <div class="flex gap-2">
                 <button @click="toastConfirm(n.id)" class="flex-1 py-1.5 px-3 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-xs font-medium transition-all">Confirm</button>
-                <button @click="toastOpen(n.url)" class="flex-1 py-1.5 px-3 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 hover:text-blue-300 text-xs font-medium transition-all">Open</button>
+                <button @click="toastOpen(n.url)" class="flex-1 py-1.5 px-3 rounded-lg bg-accent/20 hover:bg-accent/30 text-accent-400 hover:text-accent text-xs font-medium transition-all">Open</button>
               </div>
             </div>
           </template>
@@ -77,7 +77,7 @@
       <!-- Receipt panel (rendered only when expanded, never in DOM otherwise) -->
       <template x-if="expanded">
         <div class="absolute inset-0 flex flex-col overflow-hidden rounded-2xl shadow-2xl receipt-print"
-          :style="'background: rgba(22, 27, 34, ' + (config.panel_opacity || 0.95) + '); backdrop-filter: blur(20px);'"
+          :style="'background: rgba(var(--theme-bg), ' + (config.panel_opacity || 0.95) + '); backdrop-filter: blur(20px);'"
           @mouseenter="cancelAutoHide" @mouseleave="startAutoHide"
         >
           <!-- Header -->
@@ -90,7 +90,7 @@
             <span class="text-white/50 text-xs font-medium uppercase tracking-wider" x-show="!settingsOpen">
               <span x-text="notifications.length"></span> notification<span x-show="notifications.length !== 1">s</span>
             </span>
-            <button v-show="!settingsOpen && notifications.length > 0" @click="confirmAll" style="--wails-draggable: no-drag" class="text-blue-400 hover:text-blue-300 text-xs font-medium transition-colors">Confirm All</button>
+            <button v-show="!settingsOpen && notifications.length > 0" @click="confirmAll" style="--wails-draggable: no-drag" class="text-accent-400 hover:text-accent text-xs font-medium transition-colors">Confirm All</button>
           </div>
 
           <!-- Error banner -->
@@ -143,7 +143,7 @@
                 <div class="text-xs text-white/40 mb-2" x-text="g.repo + (g.prNumber ? ' #' + g.prNumber : '')"></div>
                 <div class="flex gap-2">
                   <button @click="confirm(g.id)" class="flex-1 py-1.5 px-3 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-xs font-medium transition-all">Confirm</button>
-                  <button @click="openBrowser(g.url)" class="flex-1 py-1.5 px-3 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 hover:text-blue-300 text-xs font-medium transition-all">Open</button>
+                  <button @click="openBrowser(g.url)" class="flex-1 py-1.5 px-3 rounded-lg bg-accent/20 hover:bg-accent/30 text-accent-400 hover:text-accent text-xs font-medium transition-all">Open</button>
                 </div>
               </div>
             </template>
@@ -156,19 +156,19 @@
               <div>
                 <label class="block text-white/50 text-xs mb-1">GitHub Token</label>
                 <input type="password" x-model="formToken" placeholder="ghp_..."
-                  class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500/50 transition-colors placeholder:text-white/20"
+                  class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-accent/50 transition-colors placeholder:text-white/20"
                 />
               </div>
               <div>
                 <label class="block text-white/50 text-xs mb-1">GitHub Username</label>
                 <input type="text" x-model="formUsername" placeholder="your-github-username"
-                  class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500/50 transition-colors placeholder:text-white/20"
+                  class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-accent/50 transition-colors placeholder:text-white/20"
                 />
               </div>
               <div>
                 <label class="block text-white/50 text-xs mb-1">Poll Interval (minutes)</label>
                 <input type="number" x-model="formInterval" min="1" max="60"
-                  class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500/50 transition-colors"
+                  class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-accent/50 transition-colors"
                 />
               </div>
               <div>
@@ -177,7 +177,7 @@
                   <template x-for="day in weekDays" :key="day">
                     <button @click="toggleDay(day)"
                       class="px-2.5 py-1 rounded-lg text-xs font-medium transition-all"
-                      :class="formDays.includes(day) ? 'bg-blue-500/30 text-blue-300 border border-blue-500/30' : 'bg-white/5 text-white/40 border border-white/10 hover:bg-white/10'"
+                      :class="formDays.includes(day) ? 'bg-accent/30 text-accent border border-accent/30' : 'bg-white/5 text-white/40 border border-white/10 hover:bg-white/10'"
                       x-text="day.slice(0, 3)"
                     ></button>
                   </template>
@@ -186,21 +186,21 @@
               <div class="flex gap-3">
                 <div class="flex-1">
                   <label class="block text-white/50 text-xs mb-1">Start Hour</label>
-                  <input type="number" x-model="formStartHour" min="0" max="23" class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500/50 transition-colors"/>
+                  <input type="number" x-model="formStartHour" min="0" max="23" class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-accent/50 transition-colors"/>
                 </div>
                 <div class="flex-1">
                   <label class="block text-white/50 text-xs mb-1">End Hour</label>
-                  <input type="number" x-model="formEndHour" min="0" max="23" class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500/50 transition-colors"/>
+                  <input type="number" x-model="formEndHour" min="0" max="23" class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-accent/50 transition-colors"/>
                 </div>
               </div>
               <div>
                 <label class="block text-white/50 text-xs mb-1">Auto-hide (seconds)</label>
-                <input type="number" x-model="formAutoHide" min="3" max="60" class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500/50 transition-colors"/>
+                <input type="number" x-model="formAutoHide" min="3" max="60" class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-accent/50 transition-colors"/>
               </div>
               <div class="flex items-center justify-between py-2">
                 <span class="text-white/70 text-sm">Sound on notification</span>
                 <button @click="formSound = !formSound" class="w-10 h-5 rounded-full transition-colors relative"
-                  :class="formSound ? 'bg-blue-500' : 'bg-white/20'">
+                  :class="formSound ? 'bg-accent' : 'bg-white/20'">
                   <span class="absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all shadow"
                     :class="formSound ? 'left-[22px]' : 'left-0.5'"></span>
                 </button>
@@ -209,7 +209,7 @@
                 <label class="block text-white/50 text-xs mb-1">Sound file</label>
                 <div class="flex gap-2">
                   <input type="text" x-model="formSoundPath" placeholder="/System/Library/Sounds/Ping.aiff"
-                    class="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500/50 transition-colors placeholder:text-white/20 font-mono text-[11px] truncate"
+                    class="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-accent/50 transition-colors placeholder:text-white/20 font-mono text-[11px] truncate"
                   />
                   <button @click="chooseSoundFile()" class="shrink-0 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white/70 hover:text-white text-xs font-medium transition-all">Browse</button>
                 </div>
@@ -217,7 +217,7 @@
               <div class="flex items-center justify-between py-2">
                 <span class="text-white/70 text-sm">Lock position (disable drag)</span>
                 <button @click="formDisableDrag = !formDisableDrag" class="w-10 h-5 rounded-full transition-colors relative"
-                  :class="formDisableDrag ? 'bg-blue-500' : 'bg-white/20'">
+                  :class="formDisableDrag ? 'bg-accent' : 'bg-white/20'">
                   <span class="absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all shadow"
                     :class="formDisableDrag ? 'left-[22px]' : 'left-0.5'"></span>
                 </button>
@@ -232,7 +232,7 @@
               </div>
               <div x-show="formDNDEnabled">
                 <label class="block text-white/50 text-xs mb-1">DND duration (hours)</label>
-                <select x-model="formDNDHours" class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500/50 transition-colors">
+                <select x-model="formDNDHours" class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-accent/50 transition-colors">
                   <option value="0.5">30 minutes</option>
                   <option value="1">1 hour</option>
                   <option value="2">2 hours</option>
@@ -244,7 +244,25 @@
                 <label class="block text-white/50 text-xs mb-1">Panel opacity: <span class="text-white/70" x-text="Math.round(formPanelOpacity * 100) + '%'"></span></label>
                 <input type="range" x-model="formPanelOpacity" min="0.3" max="1" step="0.05" class="w-full accent-blue-500"/>
               </div>
-              <button @click="saveSettings" class="w-full py-2.5 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition-colors mt-2">Save &amp; Restart Poller</button>
+              <div>
+                <label class="block text-white/50 text-xs mb-1.5">Theme</label>
+                <div class="flex flex-wrap gap-1.5">
+                  <template x-for="t in [{id:'default',label:'Default'},{id:'tokyo-night',label:'Tokyo Night'},{id:'custom',label:'Custom'}]" :key="t.id">
+                    <button @click="formTheme = t.id; if(t.id!=='custom') formCustomCSS=''; $nextTick(() => applyTheme())"
+                      class="px-2.5 py-1 rounded-lg text-xs font-medium transition-all"
+                      :class="formTheme === t.id ? 'bg-accent/30 text-accent border border-accent/30' : 'bg-white/5 text-white/40 border border-white/10 hover:bg-white/10'"
+                      x-text="t.label"
+                    ></button>
+                  </template>
+                </div>
+              </div>
+              <div x-show="formTheme === 'custom'">
+                <label class="block text-white/50 text-xs mb-1">Custom CSS variables</label>
+                <textarea x-model="formCustomCSS" @input="applyTheme" placeholder=":root { --theme-bg: 40, 40, 40; --theme-accent: #ff6b6b; ... }"
+                  class="w-full h-24 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-accent/50 transition-colors placeholder:text-white/20"
+                ></textarea>
+              </div>
+              <button @click="saveSettings" class="w-full py-2.5 rounded-lg bg-accent hover:bg-white/20 text-white text-sm font-medium transition-all mt-2">Save &amp; Restart Poller</button>
             </div>
           </div>
         </div>

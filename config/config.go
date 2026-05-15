@@ -27,6 +27,8 @@ type Config struct {
 	WindowX           int      `json:"window_x"`
 	WindowY           int      `json:"window_y"`
 	MockMode          bool     `json:"mock_mode"`
+	Theme             string   `json:"theme"`
+	CustomThemeCSS    string   `json:"custom_theme_css"`
 }
 
 func DefaultConfigDir() string {
@@ -49,6 +51,7 @@ func Default() *Config {
 		ScheduleEndHour:   17,
 		SoundEnabled:      true,
 		SoundPath:         "/System/Library/Sounds/Ping.aiff",
+		Theme:             "default",
 		AutoHideSeconds:   10,
 		DNDHours:          2,
 		PanelOpacity:      0.95,
