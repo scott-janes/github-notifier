@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"log"
 	"os"
 	"path/filepath"
 )
@@ -21,10 +22,18 @@ type Config struct {
 	PanelOpacity      float64  `json:"panel_opacity"`
 	WindowX           int      `json:"window_x"`
 	WindowY           int      `json:"window_y"`
+	MockMode          bool     `json:"mock_mode"`
 }
 
 func DefaultConfigDir() string {
-	dir, _ := os.UserConfigDir()
+	dir, err := os.UserConfigDir()
+	if err != nil {
+		log.Printf("config: os.UserConfigDir() failed: %v, falling back to HOME", err)
+		dir = os.Getenv("HOME")
+		if dir == "" {
+			dir = "/tmp"
+		}
+	}
 	return filepath.Join(dir, "github-notifications")
 }
 
@@ -62,5 +71,5 @@ func (c *Config) Save() error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(path, data, 0644)
+	return os.WriteFile(path, data, 0600)
 }

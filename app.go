@@ -23,8 +23,6 @@ type App struct {
 	st            *state.Store
 	notifications []gh.Notification
 	isMock        bool
-	preExpandX    int
-	preExpandY    int
 }
 
 func NewApp(isMock bool) *App {
@@ -33,6 +31,8 @@ func NewApp(isMock bool) *App {
 		log.Printf("config load error: %v", err)
 		cfg = config.Default()
 	}
+
+	cfg.MockMode = isMock
 
 	return &App{
 		cfg:    cfg,
@@ -92,11 +92,20 @@ func (a *App) onPollError(errMsg string) {
 	runtime.EventsEmit(a.ctx, "api-error", errMsg)
 }
 
+func (a *App) shutdown(ctx context.Context) {
+	if a.pl != nil {
+		a.pl.Stop()
+	}
+	if a.mockPl != nil {
+		a.mockPl.Stop()
+	}
+}
+
 // --- Bound methods exposed to frontend ---
 
 func (a *App) GetNotifications() []gh.Notification {
 	if len(a.notifications) == 0 {
-		return nil
+		return []gh.Notification{}
 	}
 
 	unconfirmed := make([]gh.Notification, 0, len(a.notifications))
@@ -218,36 +227,38 @@ func (a *App) SetWindowPosition(x, y int) {
 
 func (a *App) ExpandWindow(height int) {
 	x, y := runtime.WindowGetPosition(a.ctx)
-	a.preExpandX = x
-	a.preExpandY = y
-
 	newX := x - 360
 	if newX < 10 {
 		newX = 10
 	}
-
 	runtime.WindowSetPosition(a.ctx, newX, y)
 	runtime.WindowSetSize(a.ctx, 420, height)
 }
 
 func (a *App) ExpandToast() {
 	x, y := runtime.WindowGetPosition(a.ctx)
-	a.preExpandX = x
-	a.preExpandY = y
-
 	newX := x - 320
 	if newX < 10 {
 		newX = 10
 	}
-
 	runtime.WindowSetPosition(a.ctx, newX, y)
 	runtime.WindowSetSize(a.ctx, 380, 220)
 }
 
 func (a *App) CollapseWindow() {
-	runtime.WindowSetPosition(a.ctx, a.preExpandX, a.preExpandY)
-	a.cfg.WindowX = a.preExpandX
-	a.cfg.WindowY = a.preExpandY
+	x, y := runtime.WindowGetPosition(a.ctx)
+	w, _ := runtime.WindowGetSize(a.ctx)
+	dotX := x + w - 60
+	if dotX < 0 {
+		dotX = 0
+	}
+	dotY := y
+	if dotY < 0 {
+		dotY = 0
+	}
+	a.cfg.WindowX = dotX
+	a.cfg.WindowY = dotY
 	a.cfg.Save()
 	runtime.WindowSetSize(a.ctx, 60, 60)
+	runtime.WindowSetPosition(a.ctx, dotX, dotY)
 }

@@ -252,9 +252,10 @@ Alpine.data('app', () => ({
 
   startToastTimer() {
     this.cancelToastTimer()
+    const delay = (this.config.auto_hide_seconds || 5) * 1000
     this.toastTimer = setTimeout(() => {
       if (!this.toastPaused) this.hideToast()
-    }, 5000)
+    }, delay)
   },
 
   cancelToastTimer() {
@@ -433,9 +434,17 @@ Alpine.data('app', () => ({
     return new Date(t).toLocaleDateString()
   },
 
+  _audioCtx: null,
+
   playSound() {
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)()
+      if (!this._audioCtx) {
+        this._audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+      }
+      const ctx = this._audioCtx
+      if (ctx.state === 'suspended') {
+        ctx.resume()
+      }
       const o1 = ctx.createOscillator(); const g1 = ctx.createGain()
       o1.connect(g1); g1.connect(ctx.destination)
       o1.frequency.value = 523.25; o1.type = 'sine'
@@ -451,7 +460,9 @@ Alpine.data('app', () => ({
       g2.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.1)
       g2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3)
       o2.start(ctx.currentTime + 0.08); o2.stop(ctx.currentTime + 0.3)
-    } catch (e) {}
+    } catch (e) {
+      console.warn('playSound failed:', e)
+    }
   },
 }))
 
