@@ -371,11 +371,11 @@ Alpine.data('app', () => ({
 
   saveSettings() {
     window.go.main.App.SaveConfig(
-      this.formToken, this.formUsername, this.formInterval,
-      this.formDays, this.formStartHour, this.formEndHour,
-      this.formSound, this.formSoundPath, this.formAutoHide,
-      this.formDisableDrag, this.formDNDEnabled, this.formDNDHours,
-      this.formPanelOpacity, this.formTheme, this.formCustomCSS
+      this.formToken, this.formUsername, parseInt(this.formInterval) || 5,
+      this.formDays, parseInt(this.formStartHour) || 9, parseInt(this.formEndHour) || 17,
+      this.formSound, this.formSoundPath, parseInt(this.formAutoHide) || 10,
+      this.formDisableDrag, this.formDNDEnabled, parseFloat(this.formDNDHours) || 2,
+      parseFloat(this.formPanelOpacity) || 0.95, this.formTheme, this.formCustomCSS
     ).then(() => {
       this.config.github_token = this.formToken
       this.config.github_username = this.formUsername
