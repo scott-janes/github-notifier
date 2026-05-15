@@ -1,6 +1,6 @@
 # Configuration
 
-All settings are managed through the in-app Settings panel (gear icon in the receipt header). They are persisted to `~/.config/github-notifications/config.json`.
+All settings are managed through the in-app Settings panel (gear icon in the receipt header). They are persisted to `~/.config/github-notifier/config.json`.
 
 ## Config File Reference
 
@@ -22,7 +22,7 @@ All settings are managed through the in-app Settings panel (gear icon in the rec
 
 ## State File
 
-Notification state is stored at `~/.config/github-notifications/state.json`:
+Notification state is stored at `~/.config/github-notifier/state.json`:
 
 ```json
 {
@@ -40,7 +40,6 @@ Notification state is stored at `~/.config/github-notifications/state.json`:
 
 You need a [classic personal access token](https://github.com/settings/tokens) with the `notifications` scope. Fine-grained tokens do **not** support the Notifications API.
 
-```bash
-# The token is stored in plaintext in ~/.config/github-notifications/config.json
-# Keep your config directory secure.
-```
+The token is stored securely in the **macOS Keychain** (via `security add-generic-password`), not in the config file. The `github_token` field in `config.json` is always written as empty — the real token lives in the Keychain under service `github-notifier-token`.
+
+Existing tokens in `config.json` are automatically migrated to the Keychain on first load.

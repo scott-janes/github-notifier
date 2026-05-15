@@ -2,7 +2,7 @@
   <img src="build/appicon.png" width="96" height="96" alt="">
 </p>
 
-<h1 align="center">GitHub Notifications Tray</h1>
+<h1 align="center">GitHub Notifier</h1>
 
 <p align="center">
   A floating dot for your macOS desktop that polls GitHub for PR notifications and prints them like a receipt.
@@ -20,8 +20,8 @@
 ## Quick Start
 
 ```bash
-open github-notifications.app --args --mock    # try it with fake data
-open github-notifications.app                   # real GitHub notifications
+open github-notifier.app --args --mock    # try it with fake data
+open github-notifier.app                   # real GitHub notifications
 ```
 
 See [Installation](docs/INSTALL.md) for building from source and [Configuration](docs/CONFIGURATION.md) for setup.
@@ -47,9 +47,9 @@ See [Installation](docs/INSTALL.md) for building from source and [Configuration]
 
 ```bash
 go install github.com/wailsapp/wails/v2/cmd/wails@latest
-git clone https://github.com/scottjanes/github-notifications
-cd github-notifications && wails build
-open build/bin/github-notifications.app
+git clone https://github.com/scott-janes/github-notifier
+cd github-notifier && wails build
+open build/bin/github-notifier.app
 ```
 
 ## License

@@ -108,7 +108,7 @@ func (p *Poller) poll() {
 
 	if len(newNotifs) > 0 {
 		if p.cfg.SoundEnabled {
-			if err := sound.Play(); err != nil {
+			if err := sound.Play(p.cfg.SoundPath); err != nil {
 				log.Printf("sound error: %v", err)
 			}
 		}

@@ -38,7 +38,7 @@ The `App` struct exposes all methods callable from the frontend:
 - **Events**: Emits `new-notifications`, `count-updated`, `api-error`
 
 ### `config/`
-Loads and saves `~/.config/github-notifications/config.json`. Default values are returned if the file doesn't exist.
+Loads and saves `~/.config/github-notifier/config.json`. Default values are returned if the file doesn't exist.
 
 ### `gh/`
 GitHub REST API v3 client. Fetches from `/notifications` with pagination support (follows `Link: rel="next"` headers, up to 100 per page). Filters to `PullRequest` type only. Converts API URLs to browser URLs.

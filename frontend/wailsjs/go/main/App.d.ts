@@ -3,6 +3,8 @@
 import {config} from '../models';
 import {gh} from '../models';
 
+export function ChooseSoundFile():Promise<string>;
+
 export function CollapseWindow():Promise<void>;
 
 export function ConfirmAll():Promise<void>;
@@ -23,7 +25,7 @@ export function GetWindowPosition():Promise<number|number>;
 
 export function OpenInBrowser(arg1:string):Promise<void>;
 
-export function SaveConfig(arg1:string,arg2:string,arg3:number,arg4:Array<string>,arg5:number,arg6:number,arg7:boolean,arg8:number,arg9:boolean,arg10:boolean,arg11:number,arg12:number):Promise<void>;
+export function SaveConfig(arg1:string,arg2:string,arg3:number,arg4:Array<string>,arg5:number,arg6:number,arg7:boolean,arg8:string,arg9:number,arg10:boolean,arg11:boolean,arg12:number,arg13:number):Promise<void>;
 
 export function SaveWindowPosition(arg1:number,arg2:number):Promise<void>;
 

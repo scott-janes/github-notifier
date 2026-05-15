@@ -165,7 +165,7 @@ func (a *App) GetConfig() *config.Config {
 	return a.cfg
 }
 
-func (a *App) SaveConfig(token, username string, interval int, days []string, startHour, endHour int, sound bool, autoHide int, disableDrag bool, dndEnabled bool, dndHours float64, panelOpacity float64) error {
+func (a *App) SaveConfig(token, username string, interval int, days []string, startHour, endHour int, sound bool, soundPath string, autoHide int, disableDrag bool, dndEnabled bool, dndHours float64, panelOpacity float64) error {
 	a.cfg.GitHubToken = token
 	a.cfg.GitHubUsername = username
 	a.cfg.PollIntervalMin = interval
@@ -173,6 +173,7 @@ func (a *App) SaveConfig(token, username string, interval int, days []string, st
 	a.cfg.ScheduleStartHour = startHour
 	a.cfg.ScheduleEndHour = endHour
 	a.cfg.SoundEnabled = sound
+	a.cfg.SoundPath = soundPath
 	a.cfg.AutoHideSeconds = autoHide
 	a.cfg.DisableDrag = disableDrag
 	a.cfg.DNDEnabled = dndEnabled
@@ -209,6 +210,19 @@ func (a *App) SaveConfig(token, username string, interval int, days []string, st
 	a.ghClient = gh.NewClient(token)
 	a.startPoller()
 	return nil
+}
+
+func (a *App) ChooseSoundFile() (string, error) {
+	file, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
+		Title: "Choose Notification Sound",
+		Filters: []runtime.FileFilter{
+			{DisplayName: "Audio Files", Pattern: "*.aiff;*.wav;*.mp3;*.m4a;*.caf"},
+		},
+	})
+	if err != nil {
+		return "", err
+	}
+	return file, nil
 }
 
 func (a *App) SaveWindowPosition(x, y int) {

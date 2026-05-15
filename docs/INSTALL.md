@@ -14,12 +14,12 @@
 go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
 # Clone and build
-git clone https://github.com/scottjanes/github-notifications.git
-cd github-notifications
+git clone https://github.com/scottjanes/github-notifier.git
+cd github-notifier
 wails build
 
 # Launch
-open build/bin/github-notifications.app
+open build/bin/github-notifier.app
 ```
 
 ## Development (Hot Reload)
@@ -33,13 +33,13 @@ This starts a Vite dev server for the frontend with hot-reload. Go file changes 
 ## Mock Mode (No Token Needed)
 
 ```bash
-open build/bin/github-notifications.app --args --mock
+open build/bin/github-notifier.app --args --mock
 ```
 
 Or from the command line:
 
 ```bash
-build/bin/github-notifications.app/Contents/MacOS/github-notifications --mock
+build/bin/github-notifier.app/Contents/MacOS/github-notifier --mock
 ```
 
 Mock mode generates 1–3 fake PR notifications every 15 seconds so you can test the full UI without connecting to GitHub.
