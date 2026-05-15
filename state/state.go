@@ -2,6 +2,7 @@ package state
 
 import (
 	"encoding/json"
+	"log"
 	"os"
 	"path/filepath"
 	"sync"
@@ -37,10 +38,12 @@ func New() *Store {
 func (s *Store) load() {
 	data, err := os.ReadFile(s.filePath)
 	if err != nil {
+		log.Printf("state: no existing state file at %s: %v", s.filePath, err)
 		return
 	}
 	var ps persistedState
 	if err := json.Unmarshal(data, &ps); err != nil {
+		log.Printf("state: corrupted state file %s: %v", s.filePath, err)
 		return
 	}
 	for _, id := range ps.SeenIDs {
@@ -54,6 +57,8 @@ func (s *Store) load() {
 
 func (s *Store) Save() error {
 	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	ps := persistedState{
 		LastPollTime: s.lastPollTime,
 	}
@@ -63,7 +68,6 @@ func (s *Store) Save() error {
 	for id := range s.confirmedIDs {
 		ps.ConfirmedIDs = append(ps.ConfirmedIDs, id)
 	}
-	s.mu.Unlock()
 
 	dir := filepath.Dir(s.filePath)
 	if err := os.MkdirAll(dir, 0755); err != nil {
@@ -73,7 +77,7 @@ func (s *Store) Save() error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(s.filePath, data, 0644)
+	return os.WriteFile(s.filePath, data, 0600)
 }
 
 func (s *Store) IsNew(id string) bool {
@@ -82,24 +86,10 @@ func (s *Store) IsNew(id string) bool {
 	return !s.seenIDs[id]
 }
 
-func (s *Store) MarkSeen(id string) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.seenIDs[id] = true
-}
-
 func (s *Store) Confirm(id string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.confirmedIDs[id] = true
-}
-
-func (s *Store) ConfirmAll(ids []string) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	for _, id := range ids {
-		s.confirmedIDs[id] = true
-	}
 }
 
 func (s *Store) GetLastPollTime() time.Time {

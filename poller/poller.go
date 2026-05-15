@@ -12,6 +12,8 @@ import (
 	"github.com/scott-janes/github-notifier/sound"
 )
 
+const initialPollDelay = 2 * time.Second
+
 type NotifHandler func([]gh.Notification)
 type ErrorHandler func(string)
 
@@ -48,7 +50,7 @@ func (p *Poller) Start() {
 	p.mu.Unlock()
 
 	go func() {
-		time.Sleep(2 * time.Second)
+		time.Sleep(initialPollDelay)
 		p.poll()
 
 		ticker := time.NewTicker(time.Duration(p.cfg.PollIntervalMin) * time.Minute)

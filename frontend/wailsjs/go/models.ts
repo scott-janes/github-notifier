@@ -15,6 +15,7 @@ export namespace config {
 	    panel_opacity: number;
 	    window_x: number;
 	    window_y: number;
+	    mock_mode: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new Config(source);
@@ -36,6 +37,7 @@ export namespace config {
 	        this.panel_opacity = source["panel_opacity"];
 	        this.window_x = source["window_x"];
 	        this.window_y = source["window_y"];
+	        this.mock_mode = source["mock_mode"];
 	    }
 	}
 

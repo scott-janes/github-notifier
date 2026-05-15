@@ -94,7 +94,7 @@ func (c *Client) GetNotifications(since time.Time) ([]Notification, error) {
 		url = ""
 		link := resp.Header.Get("Link")
 		if m := linkNextRe.FindStringSubmatch(link); len(m) > 1 {
-			url = strings.Replace(m[1], "&per_page=100", "", 1)
+			url = m[1]
 		}
 	}
 
