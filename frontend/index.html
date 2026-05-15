@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-transparent">
+<head>
+  <meta charset="UTF-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>GitHub Notifications</title>
+  <style>[x-cloak]{display:none!important}</style>
+  <link rel="stylesheet" href="/src/style.css"/>
+</head>
+<body class="bg-transparent m-0 p-0 overflow-hidden select-none">
+  <div id="app">
+    <div x-data="app" class="relative w-full h-full">
+
+      <!-- Floating Dot -->
+      <div
+        x-show="!expanded"
+        @mousedown="handleDotMousedown"
+        @mouseup="handleDotMouseup"
+        class="absolute top-0 right-0 w-[60px] h-[60px] z-40 cursor-pointer flex items-center justify-center"
+        :class="{ 'drag-handle': cmdHeld && !disableDrag }"
+      >
+        <div
+          class="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-200 relative"
+          :class="dndActive ? 'bg-indigo-500/40' : (unconfirmedCount > 0 ? (pulseActive ? 'bg-blue-500 dot-pulse' : 'bg-blue-500') : 'bg-white/15 hover:bg-white/25')"
+        >
+          <!-- Moon icon during DND, bell otherwise -->
+          <svg x-show="dndActive" class="w-5 h-5 text-indigo-200/70" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/>
+          </svg>
+          <svg x-show="!dndActive && unconfirmedCount === 0" class="w-5 h-5 text-white/70" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>
+          </svg>
+          <svg x-show="!dndActive && unconfirmedCount > 0" class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>
+          </svg>
+          <span
+            v-show="unconfirmedCount > 0"
+            class="badge-pop absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center leading-none shadow-lg"
+            x-text="unconfirmedCount"
+          ></span>
+        </div>
+      </div>
+
+      <!-- Notification Toast -->
+      <div
+        x-show="toastVisible" x-cloak
+        class="absolute top-[64px] right-1 z-50 w-[340px]"
+        :class="{ 'toast-print': toastAnimating, 'toast-retract': toastRetracting }"
+        @mouseenter="pauseToastTimer" @mouseleave="resumeToastTimer"
+      >
+        <div class="rounded-b-2xl rounded-t-sm overflow-hidden" style="background: rgba(22, 27, 34, 0.96); backdrop-filter: blur(20px);">
+          <div class="h-[3px] bg-gradient-to-r from-blue-500/60 via-blue-400/40 to-transparent"></div>
+          <template x-for="(n, idx) in toastNotifications" :key="n.id">
+            <div class="px-4 py-3" :class="{ 'border-t border-white/5': idx > 0 }">
+              <div class="flex items-start justify-between mb-1">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider"
+                  :class="reasonClass(n.reason)" x-text="reasonLabel(n.reason)"
+                ></span>
+                <span class="text-[11px] text-white/30 whitespace-nowrap ml-2" x-text="timeAgo(n.updated_at)"></span>
+              </div>
+              <div class="text-sm font-medium text-white/90 leading-snug mb-0.5 pr-4" x-text="n.title"></div>
+              <div class="text-xs text-white/40 mb-3" x-text="n.repo"></div>
+              <div class="flex gap-2">
+                <button @click="toastConfirm(n.id)" class="flex-1 py-1.5 px-3 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-xs font-medium transition-all">Confirm</button>
+                <button @click="toastOpen(n.url)" class="flex-1 py-1.5 px-3 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 hover:text-blue-300 text-xs font-medium transition-all">Open</button>
+              </div>
+            </div>
+          </template>
+          <div class="relative px-4 py-2">
+            <div class="text-[10px] text-white/20 text-center tracking-[0.2em]">
+              <span x-text="toastQueue.length > 0 ? toastQueue.length + ' more in queue' : toastFooter"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Receipt panel (rendered only when expanded, never in DOM otherwise) -->
+      <template x-if="expanded">
+        <div class="absolute inset-0 flex flex-col overflow-hidden rounded-2xl shadow-2xl receipt-print"
+          :style="'background: rgba(22, 27, 34, ' + (config.panel_opacity || 0.95) + '); backdrop-filter: blur(20px);'"
+          @mouseenter="cancelAutoHide" @mouseleave="startAutoHide"
+        >
+          <!-- Header -->
+          <div class="flex items-center justify-between px-3 py-3 border-b border-white/5" :class="{ 'drag-handle': cmdHeld && !disableDrag }">
+            <div class="flex items-center gap-1">
+              <button @click="settingsOpen = !settingsOpen" style="--wails-draggable: no-drag" class="p-1 rounded-lg text-white/40 hover:text-white/80 transition-colors" :class="{ 'text-white/80': settingsOpen }">&#9881;</button>
+              <button @click="closePanel" style="--wails-draggable: no-drag" class="p-1 rounded-lg text-white/30 hover:text-white/60 transition-colors text-sm leading-none">&#10005;</button>
+              <button @click="toggleDND" style="--wails-draggable: no-drag" class="p-1 rounded-lg transition-colors text-sm" :class="dndActive ? 'text-indigo-400' : 'text-white/30 hover:text-white/60'">&#127769;</button>
+            </div>
+            <span class="text-white/50 text-xs font-medium uppercase tracking-wider" x-show="!settingsOpen">
+              <span x-text="notifications.length"></span> notification<span x-show="notifications.length !== 1">s</span>
+            </span>
+            <button v-show="!settingsOpen && notifications.length > 0" @click="confirmAll" style="--wails-draggable: no-drag" class="text-blue-400 hover:text-blue-300 text-xs font-medium transition-colors">Confirm All</button>
+          </div>
+
+          <!-- Error banner -->
+          <div x-show="apiError" x-cloak class="px-3 py-2 bg-red-500/20 border-b border-red-500/20">
+            <span class="text-red-400 text-xs" x-text="apiError"></span>
+          </div>
+
+          <!-- Notifications list -->
+          <div x-show="!settingsOpen" class="flex-1 overflow-y-auto px-3 py-2">
+            <div v-if="notifications.length === 0 && !apiError" class="flex flex-col items-center justify-center py-16 text-white/30">
+              <template x-if="!config.github_token">
+                <div class="flex flex-col items-center">
+                  <svg class="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  </svg>
+                  <span class="text-sm mb-1">Not configured</span>
+                  <span class="text-xs text-white/20">Click &#9881; to add your GitHub token</span>
+                </div>
+              </template>
+              <template x-if="config.github_token">
+                <div class="flex flex-col items-center">
+                  <svg class="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <span class="text-sm">All caught up!</span>
+                </div>
+              </template>
+            </div>
+
+            <template x-for="(g, index) in groupedNotifications()" :key="g.id + (g.prNumber || '')">
+              <div class="notif-enter group relative mb-2 p-3 rounded-xl transition-all duration-150 hover:bg-white/5"
+                :style="{ animationDelay: (index * 0.06) + 's' }">
+                <div class="flex items-start justify-between mb-1">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider"
+                    :class="reasonClass(g.reason)" x-text="reasonLabel(g.reason) + (g.count > 1 ? ' (' + g.count + ')' : '')"
+                  ></span>
+                  <span class="text-[11px] text-white/30 whitespace-nowrap ml-2" x-text="timeAgo(g.updated_at)"></span>
+                </div>
+                <div class="text-sm font-medium text-white/90 leading-snug mb-0.5 line-clamp-2" x-text="groupLabel(g)"></div>
+                <div class="text-xs text-white/40 mb-2" x-text="g.repo + (g.prNumber ? ' #' + g.prNumber : '')"></div>
+                <div class="flex gap-2">
+                  <button @click="confirm(g.id)" class="flex-1 py-1.5 px-3 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-xs font-medium transition-all">Confirm</button>
+                  <button @click="openBrowser(g.url)" class="flex-1 py-1.5 px-3 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 hover:text-blue-300 text-xs font-medium transition-all">Open</button>
+                </div>
+              </div>
+            </template>
+          </div>
+
+          <!-- Settings panel -->
+          <div x-show="settingsOpen" class="flex-1 overflow-y-auto px-4 py-3">
+            <h2 class="text-white/80 text-sm font-semibold mb-4">Settings</h2>
+            <div class="space-y-3">
+              <div>
+                <label class="block text-white/50 text-xs mb-1">GitHub Token</label>
+                <input type="password" x-model="formToken" placeholder="ghp_..."
+                  class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500/50 transition-colors placeholder:text-white/20"
+                />
+              </div>
+              <div>
+                <label class="block text-white/50 text-xs mb-1">GitHub Username</label>
+                <input type="text" x-model="formUsername" placeholder="your-github-username"
+                  class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500/50 transition-colors placeholder:text-white/20"
+                />
+              </div>
+              <div>
+                <label class="block text-white/50 text-xs mb-1">Poll Interval (minutes)</label>
+                <input type="number" x-model="formInterval" min="1" max="60"
+                  class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500/50 transition-colors"
+                />
+              </div>
+              <div>
+                <label class="block text-white/50 text-xs mb-1.5">Active Days</label>
+                <div class="flex flex-wrap gap-1.5">
+                  <template x-for="day in weekDays" :key="day">
+                    <button @click="toggleDay(day)"
+                      class="px-2.5 py-1 rounded-lg text-xs font-medium transition-all"
+                      :class="formDays.includes(day) ? 'bg-blue-500/30 text-blue-300 border border-blue-500/30' : 'bg-white/5 text-white/40 border border-white/10 hover:bg-white/10'"
+                      x-text="day.slice(0, 3)"
+                    ></button>
+                  </template>
+                </div>
+              </div>
+              <div class="flex gap-3">
+                <div class="flex-1">
+                  <label class="block text-white/50 text-xs mb-1">Start Hour</label>
+                  <input type="number" x-model="formStartHour" min="0" max="23" class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500/50 transition-colors"/>
+                </div>
+                <div class="flex-1">
+                  <label class="block text-white/50 text-xs mb-1">End Hour</label>
+                  <input type="number" x-model="formEndHour" min="0" max="23" class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500/50 transition-colors"/>
+                </div>
+              </div>
+              <div>
+                <label class="block text-white/50 text-xs mb-1">Auto-hide (seconds)</label>
+                <input type="number" x-model="formAutoHide" min="3" max="60" class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500/50 transition-colors"/>
+              </div>
+              <div class="flex items-center justify-between py-2">
+                <span class="text-white/70 text-sm">Sound on notification</span>
+                <button @click="formSound = !formSound" class="w-10 h-5 rounded-full transition-colors relative"
+                  :class="formSound ? 'bg-blue-500' : 'bg-white/20'">
+                  <span class="absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all shadow"
+                    :class="formSound ? 'left-[22px]' : 'left-0.5'"></span>
+                </button>
+              </div>
+              <div class="flex items-center justify-between py-2">
+                <span class="text-white/70 text-sm">Lock position (disable drag)</span>
+                <button @click="formDisableDrag = !formDisableDrag" class="w-10 h-5 rounded-full transition-colors relative"
+                  :class="formDisableDrag ? 'bg-blue-500' : 'bg-white/20'">
+                  <span class="absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all shadow"
+                    :class="formDisableDrag ? 'left-[22px]' : 'left-0.5'"></span>
+                </button>
+              </div>
+              <div class="flex items-center justify-between py-2">
+                <span class="text-white/70 text-sm">Do Not Disturb</span>
+                <button @click="formDNDEnabled = !formDNDEnabled" class="w-10 h-5 rounded-full transition-colors relative"
+                  :class="formDNDEnabled ? 'bg-indigo-500' : 'bg-white/20'">
+                  <span class="absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all shadow"
+                    :class="formDNDEnabled ? 'left-[22px]' : 'left-0.5'"></span>
+                </button>
+              </div>
+              <div x-show="formDNDEnabled">
+                <label class="block text-white/50 text-xs mb-1">DND duration (hours)</label>
+                <select x-model="formDNDHours" class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500/50 transition-colors">
+                  <option value="0.5">30 minutes</option>
+                  <option value="1">1 hour</option>
+                  <option value="2">2 hours</option>
+                  <option value="4">4 hours</option>
+                  <option value="8">8 hours</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-white/50 text-xs mb-1">Panel opacity: <span class="text-white/70" x-text="Math.round(formPanelOpacity * 100) + '%'"></span></label>
+                <input type="range" x-model="formPanelOpacity" min="0.3" max="1" step="0.05" class="w-full accent-blue-500"/>
+              </div>
+              <button @click="saveSettings" class="w-full py-2.5 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition-colors mt-2">Save &amp; Restart Poller</button>
+            </div>
+          </div>
+        </div>
+      </template>
+
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

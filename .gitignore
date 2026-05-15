@@ -1,0 +1,28 @@
+# Build output
+build/bin/
+*.app
+*.exe
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Go
+*.exe
+*.test
+*.out
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config (user-specific)
+config.json
+state.json
