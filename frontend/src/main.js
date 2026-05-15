@@ -111,7 +111,7 @@ Alpine.data('app', () => ({
     window.runtime.EventsOn('poll-complete', () => {
       this.pollingActive = true
       if (this._pollingTimer) clearTimeout(this._pollingTimer)
-      this._pollingTimer = setTimeout(() => { this.pollingActive = false }, 1500)
+      this._pollingTimer = setTimeout(() => { this.pollingActive = false }, 800)
     })
   },
 
