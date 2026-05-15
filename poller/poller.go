@@ -18,23 +18,25 @@ type NotifHandler func([]gh.Notification)
 type ErrorHandler func(string)
 
 type Poller struct {
-	cfg          *config.Config
-	gh           *gh.Client
-	state        *state.Store
-	handler      NotifHandler
-	errHandler   ErrorHandler
-	stopCh       chan struct{}
-	mu           sync.Mutex
-	running      bool
+	cfg        *config.Config
+	gh         *gh.Client
+	state      *state.Store
+	handler    NotifHandler
+	errHandler ErrorHandler
+	afterPoll  func()
+	stopCh     chan struct{}
+	mu         sync.Mutex
+	running    bool
 }
 
-func New(cfg *config.Config, ghClient *gh.Client, s *state.Store, handler NotifHandler, errHandler ErrorHandler) *Poller {
+func New(cfg *config.Config, ghClient *gh.Client, s *state.Store, handler NotifHandler, errHandler ErrorHandler, afterPoll func()) *Poller {
 	return &Poller{
 		cfg:        cfg,
 		gh:         ghClient,
 		state:      s,
 		handler:    handler,
 		errHandler: errHandler,
+		afterPoll:  afterPoll,
 		stopCh:     make(chan struct{}),
 	}
 }
@@ -79,6 +81,9 @@ func (p *Poller) Stop() {
 func (p *Poller) poll() {
 	now := time.Now()
 	if !p.shouldPoll(now) {
+		if p.afterPoll != nil {
+			p.afterPoll()
+		}
 		return
 	}
 
@@ -88,6 +93,9 @@ func (p *Poller) poll() {
 		log.Printf("poll error: %v", err)
 		if p.errHandler != nil {
 			p.errHandler(err.Error())
+		}
+		if p.afterPoll != nil {
+			p.afterPoll()
 		}
 		return
 	}
@@ -115,6 +123,10 @@ func (p *Poller) poll() {
 		if p.handler != nil {
 			p.handler(newNotifs)
 		}
+	}
+
+	if p.afterPoll != nil {
+		p.afterPoll()
 	}
 }
 

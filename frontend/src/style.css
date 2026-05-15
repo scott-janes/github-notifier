@@ -165,6 +165,15 @@ body {
   100% { opacity: 0; transform: scale(0.8); }
 }
 
+@keyframes dot-poll-flash {
+  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5); }
+  100% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+}
+
+.dot-polling {
+  animation: dot-poll-flash 0.35s ease-out forwards;
+}
+
 .dot-exit {
   animation: dot-exit 0.2s ease-in forwards;
 }

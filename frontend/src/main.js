@@ -27,6 +27,10 @@ Alpine.data('app', () => ({
   pulseActive: false,
   _pulseTimer: null,
 
+  // Polling state
+  pollingActive: false,
+  _pollingTimer: null,
+
   // DND state
   dndActive: false,
   _dndTimer: null,
@@ -102,6 +106,12 @@ Alpine.data('app', () => ({
     window.runtime.EventsOn('api-error', (msg) => {
       this.apiError = msg || 'GitHub API error'
       setTimeout(() => { this.apiError = '' }, 8000)
+    })
+
+    window.runtime.EventsOn('poll-complete', () => {
+      this.pollingActive = true
+      if (this._pollingTimer) clearTimeout(this._pollingTimer)
+      this._pollingTimer = setTimeout(() => { this.pollingActive = false }, 400)
     })
   },
 

@@ -79,7 +79,7 @@ func (a *App) startPoller() {
 	if a.ghClient == nil {
 		a.ghClient = gh.NewClient(a.cfg.GitHubToken)
 	}
-	a.pl = poller.New(a.cfg, a.ghClient, a.st, a.onNewNotifications, a.onPollError)
+	a.pl = poller.New(a.cfg, a.ghClient, a.st, a.onNewNotifications, a.onPollError, a.onPollComplete)
 	a.pl.Start()
 }
 
@@ -90,6 +90,10 @@ func (a *App) onNewNotifications(notifs []gh.Notification) {
 
 func (a *App) onPollError(errMsg string) {
 	runtime.EventsEmit(a.ctx, "api-error", errMsg)
+}
+
+func (a *App) onPollComplete() {
+	runtime.EventsEmit(a.ctx, "poll-complete")
 }
 
 func (a *App) shutdown(ctx context.Context) {
