@@ -100,16 +100,13 @@ func (c *Client) GetNotifications(since time.Time) ([]Notification, error) {
 
 	notifications := make([]Notification, 0, len(all))
 	for _, n := range all {
-		if n.Subject.Type != "PullRequest" {
-			continue
-		}
 		notifications = append(notifications, Notification{
 			ID:        n.ID,
 			Reason:    n.Reason,
 			Unread:    n.Unread,
 			Title:     n.Subject.Title,
 			Repo:      n.Repository.FullName,
-			URL:       apiURLToHTMLURL(n.Subject.URL),
+			URL:       apiURLToHTMLURL(n.Subject.URL, n.Subject.Type),
 			UpdatedAt: n.UpdatedAt,
 		})
 	}
@@ -141,11 +138,13 @@ func (c *Client) ValidateToken() error {
 	return nil
 }
 
-func apiURLToHTMLURL(apiURL string) string {
+func apiURLToHTMLURL(apiURL, subjectType string) string {
 	const prefix = "https://api.github.com/repos/"
 	if strings.HasPrefix(apiURL, prefix) {
 		rest := apiURL[len(prefix):]
-		rest = strings.Replace(rest, "/issues/", "/pull/", 1)
+		if subjectType == "PullRequest" {
+			rest = strings.Replace(rest, "/pulls/", "/pull/", 1)
+		}
 		return "https://github.com/" + rest
 	}
 	return apiURL
