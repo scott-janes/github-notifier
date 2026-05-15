@@ -25,7 +25,7 @@ func main() {
 	app := NewApp(isMock)
 
 	err := wails.Run(&options.App{
-		Title:     "GitHub Notifications",
+Title: "GitHub Notifier",
 		Width:     60,
 		Height:    60,
 		AssetServer: &assetserver.Options{

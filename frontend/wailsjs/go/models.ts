@@ -8,6 +8,7 @@ export namespace config {
 	    schedule_start_hour: number;
 	    schedule_end_hour: number;
 	    sound_enabled: boolean;
+	    sound_path: string;
 	    auto_hide_seconds: number;
 	    disable_drag: boolean;
 	    dnd_enabled: boolean;
@@ -30,6 +31,7 @@ export namespace config {
 	        this.schedule_start_hour = source["schedule_start_hour"];
 	        this.schedule_end_hour = source["schedule_end_hour"];
 	        this.sound_enabled = source["sound_enabled"];
+	        this.sound_path = source["sound_path"];
 	        this.auto_hide_seconds = source["auto_hide_seconds"];
 	        this.disable_drag = source["disable_drag"];
 	        this.dnd_enabled = source["dnd_enabled"];

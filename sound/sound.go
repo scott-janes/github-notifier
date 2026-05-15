@@ -6,9 +6,14 @@ import (
 	"runtime"
 )
 
-func Play() error {
+const defaultSoundPath = "/System/Library/Sounds/Ping.aiff"
+
+func Play(soundPath string) error {
 	if runtime.GOOS == "darwin" {
-		return exec.Command("afplay", "/System/Library/Sounds/Ping.aiff").Start()
+		if soundPath == "" {
+			soundPath = defaultSoundPath
+		}
+		return exec.Command("afplay", soundPath).Start()
 	}
 	log.Printf("sound: no supported sound system for %s", runtime.GOOS)
 	return nil

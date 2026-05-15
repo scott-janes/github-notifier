@@ -43,6 +43,7 @@ Alpine.data('app', () => ({
   formStartHour: 9,
   formEndHour: 17,
   formSound: true,
+  formSoundPath: '',
   formAutoHide: 10,
   formDisableDrag: false,
   formDNDEnabled: false,
@@ -116,6 +117,7 @@ Alpine.data('app', () => ({
       this.formStartHour = cfg.schedule_start_hour ?? 9
       this.formEndHour = cfg.schedule_end_hour ?? 17
       this.formSound = cfg.sound_enabled ?? true
+      this.formSoundPath = cfg.sound_path || ''
       this.formAutoHide = cfg.auto_hide_seconds || 10
       this.formDisableDrag = cfg.disable_drag ?? false
       this.disableDrag = cfg.disable_drag ?? false
@@ -353,8 +355,9 @@ Alpine.data('app', () => ({
     window.go.main.App.SaveConfig(
       this.formToken, this.formUsername, this.formInterval,
       this.formDays, this.formStartHour, this.formEndHour,
-      this.formSound, this.formAutoHide, this.formDisableDrag,
-      this.formDNDEnabled, this.formDNDHours, this.formPanelOpacity
+      this.formSound, this.formSoundPath, this.formAutoHide,
+      this.formDisableDrag, this.formDNDEnabled, this.formDNDHours,
+      this.formPanelOpacity
     ).then(() => {
       this.config.github_token = this.formToken
       this.config.github_username = this.formUsername
@@ -363,6 +366,7 @@ Alpine.data('app', () => ({
       this.config.schedule_start_hour = this.formStartHour
       this.config.schedule_end_hour = this.formEndHour
       this.config.sound_enabled = this.formSound
+      this.config.sound_path = this.formSoundPath
       this.config.auto_hide_seconds = this.formAutoHide
       this.config.disable_drag = this.formDisableDrag
       this.config.dnd_enabled = this.formDNDEnabled
@@ -382,6 +386,12 @@ Alpine.data('app', () => ({
       this.apiError = 'Settings save failed: ' + (err || 'check token')
       setTimeout(() => { this.apiError = '' }, 8000)
     })
+  },
+
+  chooseSoundFile() {
+    window.go.main.App.ChooseSoundFile().then(path => {
+      if (path) this.formSoundPath = path
+    }).catch(err => console.error('Failed to choose sound:', err))
   },
 
   toggleDay(day) {

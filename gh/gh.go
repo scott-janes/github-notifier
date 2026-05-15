@@ -62,7 +62,7 @@ func (c *Client) GetNotifications(since time.Time) ([]Notification, error) {
 		}
 		req.Header.Set("Authorization", "Bearer "+c.token)
 		req.Header.Set("Accept", "application/vnd.github.v3+json")
-		req.Header.Set("User-Agent", "github-notifications-app")
+		req.Header.Set("User-Agent", "github-notifier")
 
 		resp, err := c.client.Do(req)
 		if err != nil {
@@ -124,7 +124,7 @@ func (c *Client) ValidateToken() error {
 	}
 	req.Header.Set("Authorization", "Bearer "+c.token)
 	req.Header.Set("Accept", "application/vnd.github.v3+json")
-	req.Header.Set("User-Agent", "github-notifications-app")
+	req.Header.Set("User-Agent", "github-notifier")
 
 	resp, err := c.client.Do(req)
 	if err != nil {

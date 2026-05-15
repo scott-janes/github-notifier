@@ -58,7 +58,7 @@ Toggle DND from the receipt header (🌙 button) or configure auto-DND in Settin
 ## Settings
 
 | Setting | Description |
-|---|---|
+|---|---|---|
 | GitHub Token | Your PAT with `notifications` scope |
 | GitHub Username | Your GitHub username |
 | Poll Interval | Minutes between polls (1–60) |
@@ -66,6 +66,7 @@ Toggle DND from the receipt header (🌙 button) or configure auto-DND in Settin
 | Start/End Hour | Active polling window |
 | Auto-hide | Seconds before the receipt closes |
 | Sound | Enable/disable the notification chime |
+| Sound File | Custom notification sound (AIFF/WAV/MP3/M4A/CAF) — click Browse to pick |
 | Lock Position | Disable Cmd+drag |
 | Do Not Disturb | Auto-DND on launch + duration |
 | Panel Opacity | Receipt transparency slider |
