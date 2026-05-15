@@ -111,7 +111,7 @@ Alpine.data('app', () => ({
     window.runtime.EventsOn('poll-complete', () => {
       this.pollingActive = true
       if (this._pollingTimer) clearTimeout(this._pollingTimer)
-      this._pollingTimer = setTimeout(() => { this.pollingActive = false }, 400)
+      this._pollingTimer = setTimeout(() => { this.pollingActive = false }, 1500)
     })
   },
 
@@ -166,10 +166,13 @@ Alpine.data('app', () => ({
       const num = this._prNumber(n.url)
       const key = num ? n.repo + '#' + num : n.id
       if (!groups[key]) {
-        groups[key] = { ...n, count: 1, prNumber: num }
+        groups[key] = { ...n, count: 1, prNumber: num, reasons: [n.reason] }
       } else {
         groups[key].count++
-        groups[key].prNumber = num
+        if (!groups[key].reasons.includes(n.reason)) {
+          groups[key].reasons.push(n.reason)
+        }
+        groups[key].updated_at = n.updated_at
       }
     }
     return Object.values(groups)

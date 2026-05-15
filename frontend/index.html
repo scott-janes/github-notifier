@@ -137,9 +137,13 @@
               <div class="notif-enter group relative mb-2 p-3 rounded-xl transition-all duration-150 hover:bg-white/5"
                 :style="{ animationDelay: (index * 0.06) + 's' }">
                 <div class="flex items-start justify-between mb-1">
-                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider"
-                    :class="reasonClass(g.reason)" x-text="reasonLabel(g.reason) + (g.count > 1 ? ' (' + g.count + ')' : '')"
-                  ></span>
+                  <span class="inline-flex items-center gap-1 flex-wrap">
+                    <template x-for="r in g.reasons" :key="r">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider"
+                        :class="reasonClass(r)" x-text="reasonLabel(r)"
+                      ></span>
+                    </template>
+                  </span>
                   <span class="text-[11px] text-white/30 whitespace-nowrap ml-2" x-text="timeAgo(g.updated_at)"></span>
                 </div>
                 <div class="text-sm font-medium text-white/90 leading-snug mb-0.5 line-clamp-2" x-text="groupLabel(g)"></div>
