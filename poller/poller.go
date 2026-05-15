@@ -101,14 +101,15 @@ func (p *Poller) poll() {
 	}
 
 	var newNotifs []gh.Notification
-	ids := make([]string, 0, len(notifs))
+	keys := make([]string, 0, len(notifs))
 	for _, n := range notifs {
-		ids = append(ids, n.ID)
-		if p.state.IsNew(n.ID) {
+		key := n.ID + "@" + n.UpdatedAt.UTC().Format(time.RFC3339Nano)
+		keys = append(keys, key)
+		if p.state.IsNew(key) {
 			newNotifs = append(newNotifs, n)
 		}
 	}
-	p.state.MarkSeenBatch(ids)
+	p.state.MarkSeenBatch(keys)
 	p.state.SetLastPollTime(now)
 	if err := p.state.Save(); err != nil {
 		log.Printf("state save error: %v", err)
