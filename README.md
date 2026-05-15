@@ -24,7 +24,9 @@ open github-notifier.app --args --mock    # try it with fake data
 open github-notifier.app                   # real GitHub notifications
 ```
 
-See [Installation](docs/INSTALL.md) for building from source and [Configuration](docs/CONFIGURATION.md) for setup.
+**First time?** Open the app, click the gear icon (⚙), paste your [GitHub token](https://github.com/settings/tokens) (classic PAT with `notifications` scope), and click **Save & Restart Poller**.
+
+See [Installation](docs/INSTALL.md) for building from source and [Configuration](docs/CONFIGURATION.md) for full setup details.
 
 ## Features at a Glance
 
