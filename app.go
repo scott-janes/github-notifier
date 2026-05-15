@@ -165,7 +165,7 @@ func (a *App) GetConfig() *config.Config {
 	return a.cfg
 }
 
-func (a *App) SaveConfig(token, username string, interval int, days []string, startHour, endHour int, sound bool, soundPath string, autoHide int, disableDrag bool, dndEnabled bool, dndHours float64, panelOpacity float64) error {
+func (a *App) SaveConfig(token, username string, interval int, days []string, startHour, endHour int, sound bool, soundPath string, autoHide int, disableDrag bool, dndEnabled bool, dndHours float64, panelOpacity float64, theme string, customThemeCSS string) error {
 	a.cfg.GitHubToken = token
 	a.cfg.GitHubUsername = username
 	a.cfg.PollIntervalMin = interval
@@ -179,6 +179,8 @@ func (a *App) SaveConfig(token, username string, interval int, days []string, st
 	a.cfg.DNDEnabled = dndEnabled
 	a.cfg.DNDHours = dndHours
 	a.cfg.PanelOpacity = panelOpacity
+	a.cfg.Theme = theme
+	a.cfg.CustomThemeCSS = customThemeCSS
 
 	if token != "" && !a.isMock {
 		testClient := gh.NewClient(token)

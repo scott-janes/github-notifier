@@ -49,6 +49,9 @@ Alpine.data('app', () => ({
   formDNDEnabled: false,
   formDNDHours: 2,
   formPanelOpacity: 0.95,
+  formTheme: 'default',
+  formCustomCSS: '',
+  _themeStyleEl: null,
 
   weekDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
 
@@ -62,6 +65,10 @@ Alpine.data('app', () => ({
     window.addEventListener('blur', () => { this.cmdHeld = false })
 
     this.loadData()
+
+    this._themeStyleEl = document.createElement('style')
+    this._themeStyleEl.id = 'custom-theme'
+    document.head.appendChild(this._themeStyleEl)
 
     window.runtime.EventsOn('new-notifications', (notifs) => {
       if (!notifs || notifs.length === 0) return
@@ -124,10 +131,21 @@ Alpine.data('app', () => ({
       this.formDNDEnabled = cfg.dnd_enabled ?? false
       this.formDNDHours = cfg.dnd_hours ?? 2
       this.formPanelOpacity = cfg.panel_opacity ?? 0.95
+      this.formTheme = cfg.theme || 'default'
+      this.formCustomCSS = cfg.custom_theme_css || ''
+      this.applyTheme()
       if (cfg.dnd_enabled) {
         this._startDND(cfg.dnd_hours || 2)
       }
     }).catch(err => console.error('Failed to load config:', err))
+  },
+
+  applyTheme() {
+    const theme = this.formTheme || 'default'
+    document.documentElement.dataset.theme = theme === 'default' ? '' : theme
+    if (this._themeStyleEl) {
+      this._themeStyleEl.textContent = theme === 'custom' ? (this.formCustomCSS || '') : ''
+    }
   },
 
   // --- Grouped notifications ---
@@ -357,7 +375,7 @@ Alpine.data('app', () => ({
       this.formDays, this.formStartHour, this.formEndHour,
       this.formSound, this.formSoundPath, this.formAutoHide,
       this.formDisableDrag, this.formDNDEnabled, this.formDNDHours,
-      this.formPanelOpacity
+      this.formPanelOpacity, this.formTheme, this.formCustomCSS
     ).then(() => {
       this.config.github_token = this.formToken
       this.config.github_username = this.formUsername
@@ -372,7 +390,10 @@ Alpine.data('app', () => ({
       this.config.dnd_enabled = this.formDNDEnabled
       this.config.dnd_hours = this.formDNDHours
       this.config.panel_opacity = this.formPanelOpacity
+      this.config.theme = this.formTheme
+      this.config.custom_theme_css = this.formCustomCSS
       this.disableDrag = this.formDisableDrag
+      this.applyTheme()
 
       if (this.formDNDEnabled) {
         this._startDND(this.formDNDHours)
@@ -419,16 +440,16 @@ Alpine.data('app', () => ({
 
   reasonClass(reason) {
     const classes = {
-      review_requested: 'bg-yellow-500/20 text-yellow-400',
-      mention: 'bg-purple-500/20 text-purple-400',
-      comment: 'bg-blue-500/20 text-blue-400',
-      author: 'bg-green-500/20 text-green-400',
-      state_change: 'bg-orange-500/20 text-orange-400',
-      subscribed: 'bg-gray-500/20 text-gray-400',
-      team_mention: 'bg-pink-500/20 text-pink-400',
-      approval_required: 'bg-red-500/20 text-red-400',
+      review_requested: 'theme-badge-review',
+      mention: 'theme-badge-mention',
+      comment: 'theme-badge-comment',
+      author: 'theme-badge-author',
+      state_change: 'theme-badge-state',
+      subscribed: 'theme-badge-subscribed',
+      team_mention: 'theme-badge-team',
+      approval_required: 'theme-badge-approval',
     }
-    return classes[reason] || 'bg-gray-500/20 text-gray-400'
+    return classes[reason] || 'theme-badge-subscribed'
   },
 
   timeAgo(t) {
