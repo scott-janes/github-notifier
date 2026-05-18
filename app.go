@@ -286,23 +286,21 @@ func (a *App) ResetWindowPosition() {
 func (a *App) ExpandWindow(height int) {
 	x, y := runtime.WindowGetPosition(a.ctx)
 	newX := x - 360
-	if newX < 10 {
-		newX = 10
+	if newX < 0 {
+		newX = 0
 	}
 	runtime.WindowSetPosition(a.ctx, newX, y)
 	runtime.WindowSetSize(a.ctx, 420, height)
-	a.ensureOnScreen(420, height)
 }
 
 func (a *App) ExpandToast() {
 	x, y := runtime.WindowGetPosition(a.ctx)
 	newX := x - 320
-	if newX < 10 {
-		newX = 10
+	if newX < 0 {
+		newX = 0
 	}
 	runtime.WindowSetPosition(a.ctx, newX, y)
 	runtime.WindowSetSize(a.ctx, 380, 220)
-	a.ensureOnScreen(380, 220)
 }
 
 func (a *App) CollapseWindow() {
