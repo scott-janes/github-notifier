@@ -279,7 +279,10 @@ Alpine.data('app', () => ({
     this.hideToast()
   },
 
-  toastOpen(url) {
+  toastOpen(url, id) {
+    window.go.main.App.ConfirmNotification(id)
+    this.notifications = this.notifications.filter(n => n.id !== id)
+    this.unconfirmedCount = Math.max(0, this.unconfirmedCount - 1)
     window.go.main.App.OpenInBrowser(url)
   },
 

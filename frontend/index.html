@@ -67,7 +67,7 @@
               <div class="text-xs text-white/40 mb-3" x-text="n.repo"></div>
               <div class="flex gap-2">
                 <button @click="toastConfirm(n.id)" class="flex-1 py-1.5 px-3 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-xs font-medium transition-all">Confirm</button>
-                <button @click="toastOpen(n.url)" class="flex-1 py-1.5 px-3 rounded-lg bg-accent/20 hover:bg-accent/30 text-accent-400 hover:text-accent text-xs font-medium transition-all">Open</button>
+                <button @click="toastOpen(n.url, n.id)" class="flex-1 py-1.5 px-3 rounded-lg bg-accent/20 hover:bg-accent/30 text-accent-400 hover:text-accent text-xs font-medium transition-all">Open</button>
               </div>
             </div>
           </template>
@@ -152,7 +152,7 @@
                 <div class="text-xs text-white/40 mb-2" x-text="g.repo + (g.prNumber ? ' #' + g.prNumber : '')"></div>
                 <div class="flex gap-2">
                   <button @click="confirm(g.id)" class="flex-1 py-1.5 px-3 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-xs font-medium transition-all">Confirm</button>
-                  <button @click="openBrowser(g.url)" class="flex-1 py-1.5 px-3 rounded-lg bg-accent/20 hover:bg-accent/30 text-accent-400 hover:text-accent text-xs font-medium transition-all">Open</button>
+                  <button @click="confirm(g.id); openBrowser(g.url)" class="flex-1 py-1.5 px-3 rounded-lg bg-accent/20 hover:bg-accent/30 text-accent-400 hover:text-accent text-xs font-medium transition-all">Open</button>
                 </div>
               </div>
             </template>
