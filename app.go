@@ -23,26 +23,32 @@ type App struct {
 	st            *state.Store
 	notifications []gh.Notification
 	isMock        bool
+	resetPos      bool
 }
 
-func NewApp(isMock bool) *App {
+func NewApp(isMock bool, resetPos bool) *App {
 	cfg, err := config.Load()
 	if err != nil {
 		log.Printf("config load error: %v", err)
 		cfg = config.Default()
 	}
-
 	cfg.MockMode = isMock
 
 	return &App{
-		cfg:    cfg,
-		st:     state.New(),
-		isMock: isMock,
+		cfg:      cfg,
+		st:       state.New(),
+		isMock:   isMock,
+		resetPos: resetPos,
 	}
 }
 
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+
+	if a.resetPos {
+		a.cfg.WindowX = 0
+		a.cfg.WindowY = 0
+	}
 
 	runtime.WindowSetBackgroundColour(ctx, 0, 0, 0, 0)
 	runtime.WindowSetSize(ctx, 60, 60)
@@ -55,19 +61,45 @@ func (a *App) startup(ctx context.Context) {
 
 func (a *App) positionWindow(ctx context.Context, windowWidth int) {
 	if a.cfg.WindowX != 0 && a.cfg.WindowY != 0 {
-		runtime.WindowSetPosition(ctx, a.cfg.WindowX, a.cfg.WindowY)
-		return
+		if a.isPositionOnScreen(a.cfg.WindowX, a.cfg.WindowY, windowWidth) {
+			runtime.WindowSetPosition(ctx, a.cfg.WindowX, a.cfg.WindowY)
+			return
+		}
 	}
 	screens, err := runtime.ScreenGetAll(ctx)
 	if err != nil || len(screens) == 0 {
 		x := 1200 - (windowWidth - 60)
 		runtime.WindowSetPosition(ctx, x, 20)
+		a.saveDotPosition(x, 20)
 		return
 	}
 	screen := screens[0]
 	x := screen.Width - windowWidth - 20
 	y := 20
 	runtime.WindowSetPosition(ctx, x, y)
+	a.saveDotPosition(x, y)
+}
+
+func (a *App) isPositionOnScreen(x, y, w int) bool {
+	if x < -500 || y < -500 || x > 10000 || y > 10000 {
+		return false
+	}
+	screens, err := runtime.ScreenGetAll(a.ctx)
+	if err != nil || len(screens) == 0 {
+		return x >= 0 && y >= 0
+	}
+	for _, s := range screens {
+		if x >= -50 && x+w <= s.Size.Width+50 && y >= -50 && y+60 <= s.Size.Height+50 {
+			return true
+		}
+	}
+	return false
+}
+
+func (a *App) saveDotPosition(x, y int) {
+	a.cfg.WindowX = x
+	a.cfg.WindowY = y
+	a.cfg.Save()
 }
 
 func (a *App) startPoller() {
@@ -243,6 +275,10 @@ func (a *App) GetWindowPosition() (int, int) {
 
 func (a *App) SetWindowPosition(x, y int) {
 	runtime.WindowSetPosition(a.ctx, x, y)
+}
+
+func (a *App) ResetWindowPosition() {
+	a.positionWindow(a.ctx, 60)
 }
 
 func (a *App) ExpandWindow(height int) {

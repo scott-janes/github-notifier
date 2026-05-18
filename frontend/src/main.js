@@ -428,6 +428,10 @@ Alpine.data('app', () => ({
     }).catch(err => console.error('Failed to choose sound:', err))
   },
 
+  resetPosition() {
+    window.go.main.App.ResetWindowPosition().catch(err => console.error('Failed to reset position:', err))
+  },
+
   toggleDay(day) {
     const idx = this.formDays.indexOf(day)
     if (idx >= 0) {

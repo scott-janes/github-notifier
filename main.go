@@ -15,14 +15,17 @@ var assets embed.FS
 
 func main() {
 	isMock := false
+	resetPos := false
 	for _, arg := range os.Args[1:] {
-		if arg == "--mock" || arg == "-mock" {
+		switch arg {
+		case "--mock", "-mock":
 			isMock = true
-			break
+		case "--reset-position", "--reset-pos":
+			resetPos = true
 		}
 	}
 
-	app := NewApp(isMock)
+	app := NewApp(isMock, resetPos)
 
 	err := wails.Run(&options.App{
 Title: "GitHub Notifier",
