@@ -68,14 +68,13 @@ func (a *App) positionWindow(ctx context.Context, windowWidth int) {
 	}
 	screens, err := runtime.ScreenGetAll(ctx)
 	if err != nil || len(screens) == 0 {
-		x := 1200 - (windowWidth - 60)
-		runtime.WindowSetPosition(ctx, x, 20)
-		a.saveDotPosition(x, 20)
+		runtime.WindowSetPosition(ctx, 60, 60)
+		a.saveDotPosition(60, 60)
 		return
 	}
 	screen := screens[0]
-	x := screen.Width - windowWidth - 20
-	y := 20
+	x := screen.Width - windowWidth - 40
+	y := 60
 	runtime.WindowSetPosition(ctx, x, y)
 	a.saveDotPosition(x, y)
 }
@@ -278,7 +277,10 @@ func (a *App) SetWindowPosition(x, y int) {
 }
 
 func (a *App) ResetWindowPosition() {
-	a.positionWindow(a.ctx, 60)
+	runtime.WindowSetSize(a.ctx, 60, 60)
+	x, y := 60, 60
+	runtime.WindowSetPosition(a.ctx, x, y)
+	a.saveDotPosition(x, y)
 }
 
 func (a *App) ExpandWindow(height int) {

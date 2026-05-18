@@ -429,6 +429,7 @@ Alpine.data('app', () => ({
   },
 
   resetPosition() {
+    this.collapse()
     window.go.main.App.ResetWindowPosition().catch(err => console.error('Failed to reset position:', err))
   },
 
