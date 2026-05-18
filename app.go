@@ -291,6 +291,7 @@ func (a *App) ExpandWindow(height int) {
 	}
 	runtime.WindowSetPosition(a.ctx, newX, y)
 	runtime.WindowSetSize(a.ctx, 420, height)
+	a.ensureOnScreen(420, height)
 }
 
 func (a *App) ExpandToast() {
@@ -301,6 +302,7 @@ func (a *App) ExpandToast() {
 	}
 	runtime.WindowSetPosition(a.ctx, newX, y)
 	runtime.WindowSetSize(a.ctx, 380, 220)
+	a.ensureOnScreen(380, 220)
 }
 
 func (a *App) CollapseWindow() {
@@ -319,4 +321,19 @@ func (a *App) CollapseWindow() {
 	a.cfg.Save()
 	runtime.WindowSetSize(a.ctx, 60, 60)
 	runtime.WindowSetPosition(a.ctx, dotX, dotY)
+	a.ensureOnScreen(60, 60)
+}
+
+func (a *App) ensureOnScreen(w, h int) {
+	x, y := runtime.WindowGetPosition(a.ctx)
+	screens, err := runtime.ScreenGetAll(a.ctx)
+	if err != nil || len(screens) == 0 {
+		return
+	}
+	for _, s := range screens {
+		if x >= -50 && x+w <= s.Size.Width+50 && y >= -50 && y+h <= s.Size.Height+50 {
+			return
+		}
+	}
+	runtime.WindowSetPosition(a.ctx, 60, 60)
 }
