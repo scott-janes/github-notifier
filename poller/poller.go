@@ -133,7 +133,7 @@ func (p *Poller) poll() {
 
 func (p *Poller) shouldPoll(now time.Time) bool {
 	day := now.Weekday().String()
-	hour := now.Hour()
+	nowMinutes := now.Hour()*60 + now.Minute()
 
 	if len(p.cfg.ScheduleDays) == 0 {
 		return true
@@ -150,5 +150,7 @@ func (p *Poller) shouldPoll(now time.Time) bool {
 		return false
 	}
 
-	return hour >= p.cfg.ScheduleStartHour && hour < p.cfg.ScheduleEndHour
+	start := p.cfg.ScheduleStartHour*60 + p.cfg.ScheduleStartMinute
+	end := p.cfg.ScheduleEndHour*60 + p.cfg.ScheduleEndMinute
+	return nowMinutes >= start && nowMinutes < end
 }

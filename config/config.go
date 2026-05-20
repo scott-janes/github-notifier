@@ -16,7 +16,9 @@ type Config struct {
 	PollIntervalMin   int      `json:"poll_interval_minutes"`
 	ScheduleDays      []string `json:"schedule_days"`
 	ScheduleStartHour int      `json:"schedule_start_hour"`
+	ScheduleStartMinute int    `json:"schedule_start_minute"`
 	ScheduleEndHour   int      `json:"schedule_end_hour"`
+	ScheduleEndMinute int      `json:"schedule_end_minute"`
 	SoundEnabled      bool     `json:"sound_enabled"`
 	SoundPath         string   `json:"sound_path"`
 	AutoHideSeconds   int      `json:"auto_hide_seconds"`

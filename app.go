@@ -200,13 +200,15 @@ func (a *App) GetConfig() *config.Config {
 	return a.cfg
 }
 
-func (a *App) SaveConfig(token, username string, interval int, days []string, startHour, endHour int, sound bool, soundPath string, autoHide int, disableDrag bool, dndEnabled bool, dndHours float64, panelOpacity float64, theme string, customThemeCSS string) error {
+func (a *App) SaveConfig(token, username string, interval int, days []string, startHour, startMinute, endHour, endMinute int, sound bool, soundPath string, autoHide int, disableDrag bool, dndEnabled bool, dndHours float64, panelOpacity float64, theme string, customThemeCSS string) error {
 	a.cfg.GitHubToken = token
 	a.cfg.GitHubUsername = username
 	a.cfg.PollIntervalMin = interval
 	a.cfg.ScheduleDays = days
 	a.cfg.ScheduleStartHour = startHour
+	a.cfg.ScheduleStartMinute = startMinute
 	a.cfg.ScheduleEndHour = endHour
+	a.cfg.ScheduleEndMinute = endMinute
 	a.cfg.SoundEnabled = sound
 	a.cfg.SoundPath = soundPath
 	a.cfg.AutoHideSeconds = autoHide

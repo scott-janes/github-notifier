@@ -45,7 +45,9 @@ Alpine.data('app', () => ({
   formInterval: 5,
   formDays: [],
   formStartHour: 9,
+  formStartMinute: 0,
   formEndHour: 17,
+  formEndMinute: 0,
   formSound: true,
   formSoundPath: '',
   formAutoHide: 10,
@@ -132,7 +134,9 @@ Alpine.data('app', () => ({
       this.formInterval = cfg.poll_interval_minutes || 5
       this.formDays = cfg.schedule_days || []
       this.formStartHour = cfg.schedule_start_hour ?? 9
+      this.formStartMinute = cfg.schedule_start_minute ?? 0
       this.formEndHour = cfg.schedule_end_hour ?? 17
+      this.formEndMinute = cfg.schedule_end_minute ?? 0
       this.formSound = cfg.sound_enabled ?? true
       this.formSoundPath = cfg.sound_path || ''
       this.formAutoHide = cfg.auto_hide_seconds || 10
@@ -388,7 +392,8 @@ Alpine.data('app', () => ({
   saveSettings() {
     window.go.main.App.SaveConfig(
       this.formToken, this.formUsername, parseInt(this.formInterval) || 5,
-      this.formDays, parseInt(this.formStartHour) || 9, parseInt(this.formEndHour) || 17,
+      this.formDays, parseInt(this.formStartHour) || 9, parseInt(this.formStartMinute) || 0,
+      parseInt(this.formEndHour) || 17, parseInt(this.formEndMinute) || 0,
       this.formSound, this.formSoundPath, parseInt(this.formAutoHide) || 10,
       this.formDisableDrag, this.formDNDEnabled, parseFloat(this.formDNDHours) || 2,
       parseFloat(this.formPanelOpacity) || 0.95, this.formTheme, this.formCustomCSS
@@ -398,7 +403,9 @@ Alpine.data('app', () => ({
       this.config.poll_interval_minutes = this.formInterval
       this.config.schedule_days = this.formDays
       this.config.schedule_start_hour = this.formStartHour
+      this.config.schedule_start_minute = this.formStartMinute
       this.config.schedule_end_hour = this.formEndHour
+      this.config.schedule_end_minute = this.formEndMinute
       this.config.sound_enabled = this.formSound
       this.config.sound_path = this.formSoundPath
       this.config.auto_hide_seconds = this.formAutoHide
