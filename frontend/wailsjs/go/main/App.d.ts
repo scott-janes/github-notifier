@@ -23,6 +23,10 @@ export function GetUnconfirmedCount():Promise<number>;
 
 export function GetWindowPosition():Promise<number|number>;
 
+export function GetWindowSize():Promise<number|number>;
+
+export function OpenAndCollapse(arg1:string,arg2:string):Promise<void>;
+
 export function OpenInBrowser(arg1:string):Promise<void>;
 
 export function ResetWindowPosition():Promise<void>;
@@ -32,3 +36,5 @@ export function SaveConfig(arg1:string,arg2:string,arg3:number,arg4:Array<string
 export function SaveWindowPosition(arg1:number,arg2:number):Promise<void>;
 
 export function SetWindowPosition(arg1:number,arg2:number):Promise<void>;
+
+export function SetWindowSize(arg1:number,arg2:number):Promise<void>;

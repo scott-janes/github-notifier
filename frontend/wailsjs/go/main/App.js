@@ -42,6 +42,14 @@ export function GetWindowPosition() {
   return window['go']['main']['App']['GetWindowPosition']();
 }
 
+export function GetWindowSize() {
+  return window['go']['main']['App']['GetWindowSize']();
+}
+
+export function OpenAndCollapse(arg1, arg2) {
+  return window['go']['main']['App']['OpenAndCollapse'](arg1, arg2);
+}
+
 export function OpenInBrowser(arg1) {
   return window['go']['main']['App']['OpenInBrowser'](arg1);
 }
@@ -60,4 +68,8 @@ export function SaveWindowPosition(arg1, arg2) {
 
 export function SetWindowPosition(arg1, arg2) {
   return window['go']['main']['App']['SetWindowPosition'](arg1, arg2);
+}
+
+export function SetWindowSize(arg1, arg2) {
+  return window['go']['main']['App']['SetWindowSize'](arg1, arg2);
 }

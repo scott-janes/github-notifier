@@ -196,6 +196,29 @@ func (a *App) OpenInBrowser(url string) {
 	runtime.BrowserOpenURL(a.ctx, url)
 }
 
+func (a *App) OpenAndCollapse(url string, id string) {
+	x, y := runtime.WindowGetPosition(a.ctx)
+	w, _ := runtime.WindowGetSize(a.ctx)
+	dotX := x + w - 60
+	if dotX < 0 {
+		dotX = 0
+	}
+	dotY := y
+	if dotY < 0 {
+		dotY = 0
+	}
+	a.st.Confirm(id)
+	a.st.Save()
+	a.pruneConfirmed()
+	runtime.EventsEmit(a.ctx, "count-updated", a.GetUnconfirmedCount())
+	runtime.BrowserOpenURL(a.ctx, url)
+	runtime.WindowSetSize(a.ctx, 60, 60)
+	runtime.WindowSetPosition(a.ctx, dotX, dotY)
+	a.cfg.WindowX = dotX
+	a.cfg.WindowY = dotY
+	a.cfg.Save()
+}
+
 func (a *App) GetConfig() *config.Config {
 	return a.cfg
 }
@@ -276,6 +299,14 @@ func (a *App) GetWindowPosition() (int, int) {
 
 func (a *App) SetWindowPosition(x, y int) {
 	runtime.WindowSetPosition(a.ctx, x, y)
+}
+
+func (a *App) GetWindowSize() (int, int) {
+	return runtime.WindowGetSize(a.ctx)
+}
+
+func (a *App) SetWindowSize(w, h int) {
+	runtime.WindowSetSize(a.ctx, w, h)
 }
 
 func (a *App) ResetWindowPosition() {
