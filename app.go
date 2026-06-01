@@ -14,6 +14,8 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
+const Version = "1.0.0"
+
 type App struct {
 	ctx           context.Context
 	cfg           *config.Config
@@ -199,6 +201,9 @@ func (a *App) OpenInBrowser(url string) {
 func (a *App) OpenAndCollapse(url string, id string) {
 	x, y := runtime.WindowGetPosition(a.ctx)
 	w, _ := runtime.WindowGetSize(a.ctx)
+	if w < 100 {
+		w = 420
+	}
 	dotX := x + w - 60
 	if dotX < 0 {
 		dotX = 0
@@ -221,6 +226,10 @@ func (a *App) OpenAndCollapse(url string, id string) {
 
 func (a *App) GetConfig() *config.Config {
 	return a.cfg
+}
+
+func (a *App) GetVersion() string {
+	return Version
 }
 
 func (a *App) SaveConfig(token, username string, interval int, days []string, startHour, startMinute, endHour, endMinute int, sound bool, soundPath string, autoHide int, disableDrag bool, dndEnabled bool, dndHours float64, panelOpacity float64, theme string, customThemeCSS string) error {

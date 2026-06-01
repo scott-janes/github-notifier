@@ -21,6 +21,8 @@ export function GetNotifications():Promise<Array<gh.Notification>>;
 
 export function GetUnconfirmedCount():Promise<number>;
 
+export function GetVersion():Promise<string>;
+
 export function GetWindowPosition():Promise<number|number>;
 
 export function GetWindowSize():Promise<number|number>;

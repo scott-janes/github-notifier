@@ -39,6 +39,7 @@ Alpine.data('app', () => ({
   apiError: '',
 
   config: {},
+  version: '',
   disableDrag: false,
   formToken: '',
   formUsername: '',
@@ -71,6 +72,8 @@ Alpine.data('app', () => ({
     window.addEventListener('blur', () => { this.cmdHeld = false })
 
     this.loadData()
+
+    window.go.main.App.GetVersion().then(v => { this.version = v }).catch(() => {})
 
     this._themeStyleEl = document.createElement('style')
     this._themeStyleEl.id = 'custom-theme'

@@ -273,6 +273,7 @@
               </div>
               <button @click="saveSettings" class="w-full py-2.5 rounded-lg bg-accent hover:bg-white/20 text-white text-sm font-medium transition-all mt-2">Save &amp; Restart Poller</button>
               <button @click="resetPosition" class="w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/50 hover:text-white/80 text-xs font-medium transition-all mt-1">Reset window position</button>
+              <div class="text-center text-[9px] text-white/15 mt-3" x-text="'v' + (version || '?')"></div>
             </div>
           </div>
         </div>

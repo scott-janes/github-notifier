@@ -38,6 +38,10 @@ export function GetUnconfirmedCount() {
   return window['go']['main']['App']['GetUnconfirmedCount']();
 }
 
+export function GetVersion() {
+  return window['go']['main']['App']['GetVersion']();
+}
+
 export function GetWindowPosition() {
   return window['go']['main']['App']['GetWindowPosition']();
 }
