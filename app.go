@@ -14,7 +14,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-const Version = "1.0.0"
+const Version = "1.1.0"
 
 type App struct {
 	ctx           context.Context
@@ -26,6 +26,8 @@ type App struct {
 	notifications []gh.Notification
 	isMock        bool
 	resetPos      bool
+	preDotX       int
+	preDotY       int
 }
 
 func NewApp(isMock bool, resetPos bool) *App {
@@ -199,16 +201,20 @@ func (a *App) OpenInBrowser(url string) {
 }
 
 func (a *App) OpenAndCollapse(url string, id string) {
-	x, y := runtime.WindowGetPosition(a.ctx)
-	w, _ := runtime.WindowGetSize(a.ctx)
-	if w < 100 {
-		w = 420
+	dotX := a.preDotX
+	dotY := a.preDotY
+	if dotX == 0 && dotY == 0 {
+		x, y := runtime.WindowGetPosition(a.ctx)
+		w, _ := runtime.WindowGetSize(a.ctx)
+		if w < 100 {
+			w = 420
+		}
+		dotX = x + w - 60
+		dotY = y
 	}
-	dotX := x + w - 60
 	if dotX < 0 {
 		dotX = 0
 	}
-	dotY := y
 	if dotY < 0 {
 		dotY = 0
 	}
@@ -326,33 +332,37 @@ func (a *App) ResetWindowPosition() {
 }
 
 func (a *App) ExpandWindow(height int) {
-	x, y := runtime.WindowGetPosition(a.ctx)
-	newX := x - 360
+	a.preDotX, a.preDotY = runtime.WindowGetPosition(a.ctx)
+	newX := a.preDotX - 360
 	if newX < 0 {
 		newX = 0
 	}
-	runtime.WindowSetPosition(a.ctx, newX, y)
+	runtime.WindowSetPosition(a.ctx, newX, a.preDotY)
 	runtime.WindowSetSize(a.ctx, 420, height)
 }
 
 func (a *App) ExpandToast() {
-	x, y := runtime.WindowGetPosition(a.ctx)
-	newX := x - 320
+	a.preDotX, a.preDotY = runtime.WindowGetPosition(a.ctx)
+	newX := a.preDotX - 320
 	if newX < 0 {
 		newX = 0
 	}
-	runtime.WindowSetPosition(a.ctx, newX, y)
+	runtime.WindowSetPosition(a.ctx, newX, a.preDotY)
 	runtime.WindowSetSize(a.ctx, 380, 220)
 }
 
 func (a *App) CollapseWindow() {
-	x, y := runtime.WindowGetPosition(a.ctx)
-	w, _ := runtime.WindowGetSize(a.ctx)
-	dotX := x + w - 60
+	dotX := a.preDotX
+	dotY := a.preDotY
+	if dotX == 0 && dotY == 0 {
+		x, y := runtime.WindowGetPosition(a.ctx)
+		w, _ := runtime.WindowGetSize(a.ctx)
+		dotX = x + w - 60
+		dotY = y
+	}
 	if dotX < 0 {
 		dotX = 0
 	}
-	dotY := y
 	if dotY < 0 {
 		dotY = 0
 	}
@@ -361,7 +371,6 @@ func (a *App) CollapseWindow() {
 	a.cfg.Save()
 	runtime.WindowSetSize(a.ctx, 60, 60)
 	runtime.WindowSetPosition(a.ctx, dotX, dotY)
-	a.ensureOnScreen(60, 60)
 }
 
 func (a *App) ensureOnScreen(w, h int) {
