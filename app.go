@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"sort"
+	"time"
 
 	"github.com/scott-janes/github-notifier/config"
 	"github.com/scott-janes/github-notifier/gh"
@@ -14,7 +15,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-const Version = "1.1.0"
+const Version = "1.2.0"
 
 type App struct {
 	ctx           context.Context
@@ -28,6 +29,7 @@ type App struct {
 	resetPos      bool
 	preDotX       int
 	preDotY       int
+	stopPosMon    chan struct{}
 }
 
 func NewApp(isMock bool, resetPos bool) *App {
@@ -43,6 +45,7 @@ func NewApp(isMock bool, resetPos bool) *App {
 		st:       state.New(),
 		isMock:   isMock,
 		resetPos: resetPos,
+		stopPosMon: make(chan struct{}),
 	}
 }
 
@@ -57,6 +60,8 @@ func (a *App) startup(ctx context.Context) {
 	runtime.WindowSetBackgroundColour(ctx, 0, 0, 0, 0)
 	runtime.WindowSetSize(ctx, 60, 60)
 	a.positionWindow(ctx, 60)
+
+	go a.monitorPosition()
 
 	if a.isMock || a.cfg.GitHubToken != "" {
 		a.startPoller()
@@ -132,6 +137,11 @@ func (a *App) onPollComplete() {
 }
 
 func (a *App) shutdown(ctx context.Context) {
+	select {
+	case <-a.stopPosMon:
+	default:
+		close(a.stopPosMon)
+	}
 	if a.pl != nil {
 		a.pl.Stop()
 	}
@@ -385,4 +395,18 @@ func (a *App) ensureOnScreen(w, h int) {
 		}
 	}
 	runtime.WindowSetPosition(a.ctx, 60, 60)
+}
+
+func (a *App) monitorPosition() {
+	ticker := time.NewTicker(3 * time.Second)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ticker.C:
+			w, h := runtime.WindowGetSize(a.ctx)
+			a.ensureOnScreen(w, h)
+		case <-a.stopPosMon:
+			return
+		}
+	}
 }
